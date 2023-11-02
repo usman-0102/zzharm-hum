@@ -1,0 +1,78 @@
+---
+- name: Install and Configure Magento
+  hosts: magento
+  become: yes
+  tasks:
+    - name: Install PHP and Dependencies
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - php
+        - php-cli
+        - php-mysql
+        - php-xml
+        - php-mbstring
+        - php-curl
+        - php-gd
+        - php-intl
+
+    - name: Download and Install Composer
+      shell: >
+        php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+      args:
+        creates: "/usr/local/bin/composer-setup.php"
+      register: composer_download
+
+    - name: Run Composer Installer
+      shell: "php composer-setup.php --install-dir=/usr/local/bin --filename=composer"
+      args:
+        creates: "/usr/local/bin/composer"
+
+    - name: Download Magento
+      get_url:
+        url: "{{ magento_download_url }}"
+        dest: /var/www/magento/magento.zip
+      vars:
+        magento_download_url: "https://example.com/path-to-magento.zip"  # Replace with the actual download URL
+
+    - name: Extract Magento
+      unarchive:
+        src: /var/www/magento/magento.zip
+        dest: /var/www/magento
+        remote_src: yes
+      args:
+        creates: /var/www/magento/app/etc/config.php
+
+    - name: Configure Magento (custom configuration steps here)
+
+    - name: Set File Permissions
+      command: chmod -R 755 /var/www/magento
+      args:
+        warn: no
+
+    - name: Setup Virtual Host
+      template:
+        src: templates/magento-virtual-host.conf.j2
+        dest: /etc/apache2/sites-available/magento.conf
+      notify: Reload Apache
+
+    - name: Enable Magento Site
+      command: a2ensite magento
+      notify: Reload Apache
+
+    - name: Reload Apache
+      service:
+        name: apache2
+        state: reloaded
+
+    - name: Clean Up
+      file:
+        path: /var/www/magento/magento.zip
+        state: absent
+
+  handlers:
+    - name: Reload Apache
+      service:
+        name: apache2
+        state: reloaded
