@@ -1,0 +1,50 @@
+---
+- name: Install and Configure Metabase
+  hosts: metabase
+  become: yes
+  tasks:
+    - name: Install Java
+      apt:
+        name: openjdk-11-jre-headless
+        state: present
+
+    - name: Download Metabase JAR
+      get_url:
+        url: https://downloads.metabase.com/v0.42.0/metabase.jar
+        dest: /opt/metabase/metabase.jar
+
+    - name: Configure Metabase (custom configuration steps here)
+
+    - name: Set Database Connection
+      command: metabase migrate --database-url "your-database-connection-url"
+
+    - name: Configure SSL/TLS
+      copy:
+        src: files/ssl-certificate.pem  # Provide the path to your SSL certificate
+        dest: /opt/metabase/ssl-certificate.pem
+      when: enable_ssl
+
+    - name: Configure Email Settings
+      template:
+        src: templates/email-config-template.yml  # Provide the path to your email configuration template
+        dest: /opt/metabase/email.config
+
+    - name: Define User Roles and Permissions
+      command: metabase set-permissions --role "admin" --users "user1,user2" --database "database1,database2"
+
+    - name: Set File Permissions
+      command: chmod -R 755 /opt/metabase
+      args:
+        warn: no
+
+    - name: Start Metabase Service
+      systemd:
+        name: metabase
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: Restart Metabase Service
+      service:
+        name: metabase
+        state: restarted
