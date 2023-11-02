@@ -1,0 +1,44 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.define "magento" do |magento|
+    magento.vm.box = "ubuntu/bionic64"
+    magento.vm.network "private_network", type: "dhcp"
+    magento.vm.provider "virtualbox" do |vb|
+      vb.memory = 2048
+    end
+
+    magento.vm.provision "ansible" do |ansible|
+      ansible.playbook = "ansible/magento.yml"  # Path to your Magento Ansible playbook
+      ansible.limit = "magento"  # Name of the group in your Ansible inventory
+    end
+  end
+
+  config.vm.define "vue-storefront" do |vsf|
+    vsf.vm.box = "ubuntu/bionic64"
+    vsf.vm.network "private_network", type: "dhcp"
+    vsf.vm.provider "virtualbox" do |vb|
+      vb.memory = 2048
+    end
+
+    vsf.vm.provision "ansible" do |ansible|
+      ansible.playbook = "ansible/vuestorefront.yml"  # Path to your Vue Storefront Ansible playbook
+      ansible.limit = "vue-storefront"  # Name of the group in your Ansible inventory
+    end
+  end
+
+  config.vm.define "metabase" do |metabase|
+    metabase.vm.box = "ubuntu/bionic64"
+    metabase.vm.network "private_network", type: "dhcp"
+    metabase.vm.provider "virtualbox" do |vb|
+      vb.memory = 2048
+    end
+
+    metabase.vm.provision "ansible" do |ansible|
+      ansible.playbook = "ansible/metabase.yml"  # Path to your Metabase Ansible playbook
+      ansible.limit = "metabase"  # Name of the group in your Ansible inventory
+    end
+  end
+end
+

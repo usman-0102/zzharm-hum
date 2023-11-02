@@ -1,0 +1,9 @@
+[magento]
+magento_server ansible_host=192.168.1.100
+
+[vue-storefront]
+vsf_server ansible_host=192.168.1.101
+
+[metabase]
+metabase_server ansible_host=192.168.1.102
+

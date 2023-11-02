@@ -1,0 +1,11 @@
+# ../ansible/requirements.yml
+
+# You can specify roles from Ansible Galaxy by specifying their source (src) and version (optional).
+- name: geerlingguy.apache
+  src: geerlingguy.apache
+  version: 6.0.0
+
+- name: geerlingguy.mysql
+  src: geerlingguy.mysql
+  version: 3.0.0
+

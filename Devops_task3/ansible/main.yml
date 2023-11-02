@@ -1,0 +1,10 @@
+---
+- name: Main Playbook
+  hosts: all
+  gather_facts: yes
+  become: yes
+
+  tasks:
+    - include: vuestorefront.yml
+    - include: magento.yml
+    - include: metabase.yml
