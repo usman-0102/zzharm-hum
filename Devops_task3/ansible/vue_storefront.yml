@@ -1,0 +1,25 @@
+---
+- name: Install and Configure Vue Storefront
+  hosts: vue-storefront
+  become: yes
+  tasks:
+    - name: Install Node.js
+      apt:
+        name: nodejs
+        state: present
+
+    - name: Install npm
+      apt:
+        name: npm
+        state: present
+
+    - name: Clone Vue Storefront Repository
+      git:
+        repo: https://github.com/DivanteLtd/vue-storefront.git
+        dest: /opt/vue-storefront
+        update: yes
+
+    - name: Install Vue Storefront Dependencies
+      command: npm install
+      args:
+        chdir: /opt/vue-storefront
